@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#030712">
     <link rel="apple-touch-icon" href="./icon.svg">
     <link rel="manifest" href="./manifest.json">
-    <title>ガイドぷらす</title>
+    <title>ガイドぷらす v1.1</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -83,27 +83,64 @@
             label: `${i % 8 + 1}`,
             fileName: '',
             volume: 1.0,
-            loop: false,
+            loop: i < 8 ? true : false,
             useFade: i < 8 ? true : false
         }));
 
         function App() {
             const [activeTab, setActiveTab] = useState('main');
-            const [pads, setPads] = useState(DEFAULT_PADS);
+            const [pads, setPads] = useState(() => {
+                const saved = localStorage.getItem('guide-plus-pads');
+                return saved ? JSON.parse(saved) : DEFAULT_PADS;
+            });
             const [availableFiles, setAvailableFiles] = useState([]);
             const [isLoading, setIsLoading] = useState(false);
 
-            const [musicVolume, setMusicVolume] = useState(0.8);
-            const [soundVolume, setSoundVolume] = useState(0.8);
-            const [masterVolume, setMasterVolume] = useState(1.0);
-            const [masterGain, setMasterGain] = useState(1.0);
+            const [musicVolume, setMusicVolume] = useState(() => {
+                const saved = localStorage.getItem('guide-plus-musicVol');
+                return saved !== null ? parseFloat(saved) : 0.8;
+            });
+            const [soundVolume, setSoundVolume] = useState(() => {
+                const saved = localStorage.getItem('guide-plus-soundVol');
+                return saved !== null ? parseFloat(saved) : 0.8;
+            });
+            const [masterVolume, setMasterVolume] = useState(() => {
+                const saved = localStorage.getItem('guide-plus-masterVol');
+                return saved !== null ? parseFloat(saved) : 1.0;
+            });
+            const [masterGain, setMasterGain] = useState(() => {
+                const saved = localStorage.getItem('guide-plus-masterGain');
+                return saved !== null ? parseFloat(saved) : 1.0;
+            });
 
-            const [globalFadeTime, setGlobalFadeTime] = useState(2.0);
-            const [isCrossfade, setIsCrossfade] = useState(true);
+            const [globalFadeTime, setGlobalFadeTime] = useState(() => {
+                const saved = localStorage.getItem('guide-plus-fadeTime');
+                return saved !== null ? parseFloat(saved) : 2.0;
+            });
+            const [isCrossfade, setIsCrossfade] = useState(() => {
+                const saved = localStorage.getItem('guide-plus-isCrossfade');
+                return saved !== null ? JSON.parse(saved) : true;
+            });
             const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-            const [micSettings, setMicSettings] = useState({ active: false, volume: 0.8, reverb: 0.0, pitch: 1.0 });
+            const [micSettings, setMicSettings] = useState(() => {
+                const saved = localStorage.getItem('guide-plus-micSettings');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    return { ...parsed, active: false };
+                }
+                return { active: false, volume: 0.8, reverb: 0.0, pitch: 1.0 };
+            });
             const [playingStatus, setPlayingStatus] = useState(Array(16).fill('stopped'));
+
+            useEffect(() => { localStorage.setItem('guide-plus-pads', JSON.stringify(pads)); }, [pads]);
+            useEffect(() => { localStorage.setItem('guide-plus-musicVol', musicVolume); }, [musicVolume]);
+            useEffect(() => { localStorage.setItem('guide-plus-soundVol', soundVolume); }, [soundVolume]);
+            useEffect(() => { localStorage.setItem('guide-plus-masterVol', masterVolume); }, [masterVolume]);
+            useEffect(() => { localStorage.setItem('guide-plus-masterGain', masterGain); }, [masterGain]);
+            useEffect(() => { localStorage.setItem('guide-plus-fadeTime', globalFadeTime); }, [globalFadeTime]);
+            useEffect(() => { localStorage.setItem('guide-plus-isCrossfade', JSON.stringify(isCrossfade)); }, [isCrossfade]);
+            useEffect(() => { localStorage.setItem('guide-plus-micSettings', JSON.stringify(micSettings)); }, [micSettings]);
 
             const audioCtxRef = useRef(null);
             const musicMasterRef = useRef(null);
@@ -600,8 +637,8 @@
                     </header>
 
                     {activeTab === 'main' && (
-                        <div className="flex-1 flex flex-col p-2 md:p-4 gap-2 md:gap-4 overflow-hidden">
-                            <div className="flex-1 flex flex-col bg-gray-900/40 rounded-xl border border-gray-800 p-2 md:p-4 min-h-0">
+                        <div className="flex-1 flex flex-col landscape:flex-row p-2 md:p-4 gap-2 md:gap-4 overflow-hidden">
+                            <div className="flex-1 flex flex-col bg-gray-900/40 rounded-xl border border-gray-800 p-2 md:p-4 min-h-0 landscape:w-1/2">
                                 <div className="shrink-0 flex justify-between items-center mb-2 md:mb-4 gap-2 border-b border-gray-800 pb-2">
                                     <div className="flex items-center gap-2 md:gap-4 flex-1">
                                         <div className="flex items-center gap-1.5 md:gap-2 text-blue-400 shrink-0">
@@ -631,7 +668,7 @@
                                 </div>
                             </div>
 
-                            <div className="flex-1 flex flex-col bg-gray-900/40 rounded-xl border border-gray-800 p-2 md:p-4 min-h-0">
+                            <div className="flex-1 flex flex-col bg-gray-900/40 rounded-xl border border-gray-800 p-2 md:p-4 min-h-0 landscape:w-1/2">
                                 <div className="shrink-0 flex justify-between items-center mb-2 md:mb-4 gap-2 border-b border-gray-800 pb-2">
                                     <div className="flex items-center gap-2 md:gap-4">
                                         <div className="flex items-center gap-1.5 md:gap-2 text-orange-400 shrink-0">
