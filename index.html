@@ -82,7 +82,7 @@
         const DEFAULT_PADS = Array.from({ length: 16 }).map((_, i) => ({
             id: i,
             type: i < 8 ? 'music' : 'se',
-            label: i < 8 ? `Music ${i + 1}` : `SE ${i - 7}`,
+            label: `${i % 8 + 1}`,
             fileName: '',
             volume: 1.0,
             loop: false,
@@ -479,10 +479,7 @@
                             {isPlaying ? <Pause size={28} className="text-white md:w-9 md:h-9" /> : <Play size={28} className="text-white ml-1 md:w-9 md:h-9" />}
                         </div>
 
-                        <div className="flex justify-between items-center pt-1 border-t border-white/10 shrink-0">
-                            <div className="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-white/70">
-                                {isPlaying ? 'Playing' : isPaused ? 'Paused' : 'Ready'}
-                            </div>
+                        <div className="flex justify-end items-center pt-1 border-t border-white/10 shrink-0">
                             <div className="flex gap-1.5 md:gap-2">
                                 {pad.type === 'music' && (
                                     <button
@@ -683,7 +680,7 @@
 
                                         <div className={`w-full md:w-24 text-center font-bold px-3 py-2 rounded text-sm tracking-wider
                                     ${pad.type === 'music' ? 'bg-blue-900/50 text-blue-300' : 'bg-orange-900/50 text-orange-300'}`}>
-                                            {pad.type === 'music' ? 'MUSIC' : 'SE'} {pad.id % 8 + 1}
+                                            {pad.id % 8 + 1}
                                         </div>
 
                                         <div className="flex-1 flex flex-col gap-2 w-full md:min-w-[250px]">
